@@ -7,7 +7,7 @@ import VideoFileIcon from '@mui/icons-material/VideoFile';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
-import type { SessionUpload } from '../types';
+import type { SessionUpload } from '../../../types';
 
 const ACCEPT_STRING = '.txt,.vtt,.srt,.csv,.json,.md,.mp4,.webm,.mov,.mp3,.wav';
 const MAX_TEXT_SIZE = 5 * 1024 * 1024; // 5MB for text files

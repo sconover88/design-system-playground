@@ -1,7 +1,7 @@
 import { Box, Typography, Alert, Stack, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
-import { usePlaygroundTheme } from '../context/ThemeContext';
+import { usePlaygroundTheme } from '../providers/ThemeProvider';
 import { useMemo } from 'react';
 
 function getContrastRatio(hex1: string, hex2: string): number {
@@ -63,8 +63,8 @@ export default function AccessibilityHints() {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" gutterBottom>Accessibility Hints</Typography>
-      <Alert severity="info" sx={{ mb: 2 }}>
-        These hints are based on WCAG 2.1 guidelines for your current theme settings.
+      <Alert severity="info" sx={{ mb: 2 }} icon={false}>
+        <span>These hints are based on WCAG 2.1 guidelines for your current theme settings.</span>
       </Alert>
       <List dense>
         {hints.map((hint, i) => (

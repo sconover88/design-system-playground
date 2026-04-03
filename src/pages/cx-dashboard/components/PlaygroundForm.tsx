@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Box, TextField, Button, Typography, Stack, Paper, Alert, CircularProgress } from '@mui/material';
-import { usePlaygrounds } from '../api/playgrounds';
+import { usePlaygrounds } from '../../../services/playgrounds';
 import FigmaDropZone from './FigmaDropZone';
 import SessionUploadZone from './SessionUploadZone';
-import { defaultPlaygroundTheme } from '../theme';
-import type { SessionUpload } from '../types';
+import { defaultPlaygroundTheme } from '../../../theme';
+import type { SessionUpload } from '../../../types';
 
 interface Props {
   onClose: () => void;

@@ -1,6 +1,6 @@
 import { Grid, Typography, Box } from '@mui/material';
 import PlaygroundCard from './PlaygroundCard';
-import { usePlaygrounds } from '../api/playgrounds';
+import { usePlaygrounds } from '../../../services/playgrounds';
 
 interface Props {
   filter: 'active' | 'archived' | 'all';

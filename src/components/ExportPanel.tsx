@@ -2,8 +2,8 @@ import { Box, Typography, Button, Stack, Snackbar, Alert } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useState } from 'react';
-import { usePlaygroundTheme } from '../context/ThemeContext';
-import { exportThemeJSON, downloadThemeFile, copyToClipboard } from '../utils/exportUtils';
+import { usePlaygroundTheme } from '../providers/ThemeProvider';
+import { exportThemeJSON, downloadThemeFile, downloadFigmaTokens, copyToClipboard } from '../lib/exportUtils';
 
 export default function ExportPanel() {
   const { playgroundTheme } = usePlaygroundTheme();
@@ -61,6 +61,9 @@ export default theme;`;
         <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleDownload} fullWidth>
           Download Theme File
         </Button>
+        <Button variant="contained" color="secondary" startIcon={<DownloadIcon />} onClick={() => { downloadFigmaTokens(playgroundTheme); showSnack('Figma tokens downloaded!'); }} fullWidth>
+          Download Figma Tokens
+        </Button>
         <Box sx={{ mt: 2, p: 1.5, bgcolor: 'grey.100', borderRadius: 1, maxHeight: 200, overflow: 'auto' }}>
           <Typography variant="caption" component="pre" sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: 'text.primary' }}>
             {exportThemeJSON(playgroundTheme)}
@@ -68,7 +71,9 @@ export default theme;`;
         </Box>
       </Stack>
       <Snackbar open={snackOpen} autoHideDuration={2000} onClose={() => setSnackOpen(false)}>
-        <Alert severity="success" variant="filled" onClose={() => setSnackOpen(false)}>{snackMsg}</Alert>
+        <Alert severity="success" variant="filled" onClose={() => setSnackOpen(false)} icon={false}>
+          <span>{snackMsg}</span>
+        </Alert>
       </Snackbar>
     </Box>
   );

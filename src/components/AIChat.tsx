@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import {
-  Box, TextField, IconButton, Paper, Typography, Stack, CircularProgress, Fab, Badge, Collapse,
+  Box, TextField, IconButton, Paper, Typography, Stack, CircularProgress, Fab, Badge,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ChatIcon from '@mui/icons-material/Chat';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import type { ChatMessage, SessionUpload } from '../types';
-import { usePlaygroundTheme } from '../context/ThemeContext';
+import { usePlaygroundTheme } from '../providers/ThemeProvider';
 import { v4 as uuidv4 } from 'uuid';
 
 function buildSessionSummary(uploads: SessionUpload[]): string {
@@ -179,7 +179,7 @@ export default function AIChat({ sessionUploads = [] }: AIChatProps) {
   return (
     <Box sx={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1300 }}>
       {/* Floating chat window */}
-      <Collapse in={open} unmountOnExit>
+      {open && (
         <Paper
           elevation={8}
           sx={{
@@ -263,8 +263,8 @@ export default function AIChat({ sessionUploads = [] }: AIChatProps) {
                 size="small"
                 placeholder="Ask about themes, colors, accessibility..."
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
                 aria-label="Chat message input"
               />
               <IconButton color="primary" onClick={handleSend} disabled={loading || !input.trim()} aria-label="Send message">
@@ -273,7 +273,7 @@ export default function AIChat({ sessionUploads = [] }: AIChatProps) {
             </Stack>
           </Box>
         </Paper>
-      </Collapse>
+      )}
 
       {/* FAB toggle */}
       {!open && (

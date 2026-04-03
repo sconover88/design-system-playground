@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeContextProvider } from './context/ThemeContext';
-import PlaygroundPage from './pages/index';
+import { ThemeContextProvider } from './providers/ThemeProvider';
+import PlaygroundPage from './pages/playground';
 import CxDashboardPage from './pages/cx-dashboard';
-import SharedPlayground from './pages/SharedPlayground';
+import SharedPlayground from './pages/shared';
 
 function App() {
   return (

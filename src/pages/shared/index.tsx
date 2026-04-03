@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { usePlaygrounds } from '../api/playgrounds';
-import PlaygroundPage from './index';
+import { usePlaygrounds } from '../../services/playgrounds';
+import PlaygroundPage from '../playground';
 import { Box, Typography, Button } from '@mui/material';
 
 export default function SharedPlayground() {
