@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Box, TextField, IconButton, Paper, Typography, Stack, CircularProgress } from '@mui/material';
+import {
+  Box, TextField, IconButton, Paper, Typography, Stack, CircularProgress, Fab, Badge, Collapse,
+} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
+import CloseIcon from '@mui/icons-material/Close';
+import ChatIcon from '@mui/icons-material/Chat';
+import MinimizeIcon from '@mui/icons-material/Minimize';
 import type { ChatMessage, SessionUpload } from '../types';
 import { usePlaygroundTheme } from '../context/ThemeContext';
 import { v4 as uuidv4 } from 'uuid';
@@ -127,6 +132,8 @@ export default function AIChat({ sessionUploads = [] }: AIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([hasContext ? SYSTEM_WELCOME_WITH_CONTEXT : SYSTEM_WELCOME]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { playgroundTheme } = usePlaygroundTheme();
 
@@ -160,61 +167,122 @@ export default function AIChat({ sessionUploads = [] }: AIChatProps) {
       };
       setMessages((prev) => [...prev, aiMsg]);
       setLoading(false);
+      if (!open) setUnread((n) => n + 1);
     }, 800);
   };
 
+  const handleOpen = () => {
+    setOpen(true);
+    setUnread(0);
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 400 }}>
-      <Typography variant="h6" sx={{ p: 2, pb: 1 }}>AI Theme Assistant</Typography>
-      <Box sx={{ flex: 1, overflow: 'auto', px: 2, pb: 1 }}>
-        {messages.map((msg) => (
-          <Stack
-            key={msg.id}
-            direction="row"
-            spacing={1}
-            sx={{ mb: 1.5, justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}
+    <Box sx={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1300 }}>
+      {/* Floating chat window */}
+      <Collapse in={open} unmountOnExit>
+        <Paper
+          elevation={8}
+          sx={{
+            width: 380,
+            height: 520,
+            maxHeight: 'calc(100vh - 100px)',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 3,
+            overflow: 'hidden',
+            mb: 1.5,
+          }}
+        >
+          {/* Header */}
+          <Box
+            sx={{
+              px: 2,
+              py: 1.5,
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
-            {msg.role === 'assistant' && <SmartToyIcon color="primary" sx={{ mt: 0.5 }} />}
-            <Paper
-              sx={{
-                p: 1.5,
-                maxWidth: '80%',
-                bgcolor: msg.role === 'user' ? 'primary.main' : 'grey.100',
-                color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              <Typography variant="body2">{msg.content}</Typography>
-            </Paper>
-            {msg.role === 'user' && <PersonIcon color="action" sx={{ mt: 0.5 }} />}
-          </Stack>
-        ))}
-        {loading && (
-          <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
-            <SmartToyIcon color="primary" sx={{ mt: 0.5 }} />
-            <Paper sx={{ p: 1.5, bgcolor: 'grey.100' }}>
-              <CircularProgress size={16} />
-            </Paper>
-          </Stack>
-        )}
-        <div ref={bottomRef} />
-      </Box>
-      <Box sx={{ p: 2, pt: 1, borderTop: 1, borderColor: 'divider' }}>
-        <Stack direction="row" spacing={1}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Ask about themes, colors, accessibility..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-            aria-label="Chat message input"
-          />
-          <IconButton color="primary" onClick={handleSend} disabled={loading || !input.trim()} aria-label="Send message">
-            <SendIcon />
-          </IconButton>
-        </Stack>
-      </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <SmartToyIcon fontSize="small" />
+              <Typography variant="subtitle1" fontWeight={600}>AI Theme Assistant</Typography>
+            </Stack>
+            <Stack direction="row" spacing={0.5}>
+              <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'inherit' }} aria-label="Minimize chat">
+                <MinimizeIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'inherit' }} aria-label="Close chat">
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          </Box>
+
+          {/* Messages */}
+          <Box sx={{ flex: 1, overflow: 'auto', px: 2, py: 1.5 }}>
+            {messages.map((msg) => (
+              <Stack
+                key={msg.id}
+                direction="row"
+                spacing={1}
+                sx={{ mb: 1.5, justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}
+              >
+                {msg.role === 'assistant' && <SmartToyIcon color="primary" sx={{ mt: 0.5, fontSize: 20 }} />}
+                <Paper
+                  sx={{
+                    p: 1.5,
+                    maxWidth: '80%',
+                    bgcolor: msg.role === 'user' ? 'primary.main' : 'grey.100',
+                    color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
+                    whiteSpace: 'pre-wrap',
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontSize: 13 }}>{msg.content}</Typography>
+                </Paper>
+                {msg.role === 'user' && <PersonIcon color="action" sx={{ mt: 0.5, fontSize: 20 }} />}
+              </Stack>
+            ))}
+            {loading && (
+              <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
+                <SmartToyIcon color="primary" sx={{ mt: 0.5, fontSize: 20 }} />
+                <Paper sx={{ p: 1.5, bgcolor: 'grey.100', borderRadius: 2 }}>
+                  <CircularProgress size={16} />
+                </Paper>
+              </Stack>
+            )}
+            <div ref={bottomRef} />
+          </Box>
+
+          {/* Input */}
+          <Box sx={{ p: 1.5, borderTop: 1, borderColor: 'divider' }}>
+            <Stack direction="row" spacing={1}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Ask about themes, colors, accessibility..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                aria-label="Chat message input"
+              />
+              <IconButton color="primary" onClick={handleSend} disabled={loading || !input.trim()} aria-label="Send message">
+                <SendIcon />
+              </IconButton>
+            </Stack>
+          </Box>
+        </Paper>
+      </Collapse>
+
+      {/* FAB toggle */}
+      {!open && (
+        <Fab color="primary" onClick={handleOpen} aria-label="Open AI chat" sx={{ boxShadow: 6 }}>
+          <Badge badgeContent={unread} color="error">
+            <ChatIcon />
+          </Badge>
+        </Fab>
+      )}
     </Box>
   );
 }

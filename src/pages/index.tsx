@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import {
   Box, Drawer, List, ListItem, ListItemButton, ListItemText, Collapse,
-  Typography, AppBar, Toolbar, IconButton, useMediaQuery, useTheme, Stack, Paper, Tabs, Tab,
+  Typography, AppBar, Toolbar, IconButton, useMediaQuery, useTheme, Stack, Paper, Tabs, Tab, Button, Menu, MenuItem, ListItemIcon,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DownloadIcon from '@mui/icons-material/Download';
 import { galleryCategories } from '../data/galleryConfig';
 import { GalleryDemo } from '../components/gallery';
 import ThemeCustomizer from '../components/ThemeCustomizer';
@@ -13,6 +16,8 @@ import AIChat from '../components/AIChat';
 import ExportPanel from '../components/ExportPanel';
 import AccessibilityHints from '../components/AccessibilityHints';
 import type { SessionUpload } from '../types';
+import { usePlaygroundTheme } from '../context/ThemeContext';
+import { exportThemeJSON, downloadThemeFile, downloadFigmaTokens, copyToClipboard } from '../utils/exportUtils';
 
 const DRAWER_WIDTH = 280;
 const RIGHT_PANEL_WIDTH = 340;
@@ -24,11 +29,14 @@ interface PlaygroundPageProps {
 export default function PlaygroundPage({ sessionUploads }: PlaygroundPageProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { playgroundTheme } = usePlaygroundTheme();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ inputs: true });
   const [selectedComponent, setSelectedComponent] = useState('button');
   const [rightTab, setRightTab] = useState(0);
+  const [exportAnchor, setExportAnchor] = useState<null | HTMLElement>(null);
+  const [snackMsg, setSnackMsg] = useState('');
 
   const toggleCategory = (id: string) => {
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
